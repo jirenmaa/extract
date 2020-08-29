@@ -112,10 +112,10 @@ def merge_docx_file():
             for file in __xml_rels__:
                 _file_ = f'./archive/xml_rels/{file}'
                 with open(_file_, 'r', encoding='utf-8') as f:
-                    data=f.read()
+                    data = f.read()
 
                     # read xml content
-                    xml_content=BeautifulSoup(data, "xml")
+                    xml_content = BeautifulSoup(data, "xml")
 
                     if file.endswith(".rels"):
                         # write the rels file
@@ -143,12 +143,12 @@ def main():
     """
     global archive, docxx_name
 
-    args=sys.argv[1:]
-    file1=args[1]
-    save2=args[3]
+    args = sys.argv[1:]
+    file1 = args[1]
+    save2 = args[3]
 
-    archive=zipfile.ZipFile(mpath + f'./docx/{file1}.docx')
-    docxx_name=save2 + ".docx"
+    archive = zipfile.ZipFile(mpath + f'./docx/{file1}.docx')
+    docxx_name = save2 + ".docx"
 
     merge_docx_file()
 
