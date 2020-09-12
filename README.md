@@ -1,1 +1,3 @@
-extract the content of .docx file from the image, and get the needed file and rewrite to the new file .docx
+Learn python zipfile module
+
+Extract an image that have content of docx, and return the content to new docx file with the same file of docx content

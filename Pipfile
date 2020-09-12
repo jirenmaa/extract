@@ -10,6 +10,7 @@ autopep8 = "*"
 "ruamel.std.zipfile" = "*"
 python-docx = "*"
 bs4 = "*"
+black = "*"
 
 [requires]
 python_version = "3.8"
