@@ -149,7 +149,7 @@ def merging_docx():
             print(ex)
 
 
-def cli(args):
+def command(args):
     """
     :Command Helper
 
@@ -172,7 +172,7 @@ def cli(args):
 def main():
     start_time = time.time()
     global _file_, _name_
-    response = cli(args=sys.argv[1:])
+    response = command(args=sys.argv[1:])
 
     _file_ = response["file"]
 
