@@ -13,6 +13,7 @@ from bs4 import BeautifulSoup
 
 _root_ = str(pathlib.Path(__file__).parent.absolute())
 _file_ = ""
+docx = ""
 
 image = {
     "name": "",
@@ -20,7 +21,7 @@ image = {
 }
 
 skip_file = [
-    "[Content_Types].xml",
+    "[Content_Types].xml"
 ]
 
 should_extract = {"files": "", "paths": ""}
@@ -99,6 +100,8 @@ def ext_docx_content_from_image():
 
 def create_docx_template(name="result.docx"):
     """Create docx file template for merging docx"""
+    global docx
+
     docx = Document()
     docx.add_heading("Template Document", 0)
     docx.save(name)
@@ -107,7 +110,10 @@ def create_docx_template(name="result.docx"):
 def merging_docx():
     """Merging content of file docx with template docx"""
 
+    mime_type = (".jpg", ".png", ".jpeg")
+
     # delete file that have same name as the file that should be extracted
+    print(should_extract)
     index = 0
     for file in should_extract["paths"]:
         zipfile.delete_from_zip_file(
@@ -116,27 +122,48 @@ def merging_docx():
 
         index += 1
 
+    # python run.py -f tugas_img_test.docx
     with zipfile.ZipFile("result.docx", "a") as content:
         try:
-
             index = 0
             for file in should_extract["paths"]:
+                file_index_path = should_extract["paths"][index]
                 file_path = "%s\\archive\\docx_content\\%s" % (
                     _root_,
                     should_extract["files"][index],
                 )
 
                 with open(file_path, "r", encoding="utf-8") as f:
-                    data = f.read()
+                    if file_index_path.endswith(mime_type):
+                        image_path = "%s%s" % (_root_ + "\\archive\\docx_content\\", should_extract["files"][index])
 
-                    # get content data of file in `docx_content` dir
-                    content_data = BeautifulSoup(data, "xml")
-                    # overwrite the files content with content in `docx_content` dir
-                    content.writestr(
-                        should_extract["paths"][index],
-                        bytes(str(content_data), encoding="utf-8"),
-                    )
-                    f.close()
+                        image_handle = open(image_path, "rb")
+                        raw_image_data = image_handle.read()
+                        content.writestr(
+                            file_index_path,
+                            raw_image_data
+                        )
+                        image_handle.close()
+
+                        # docx.add_picture(
+                        #     "%s%s"
+                        #     % (
+                        #         _root_ + "\\archive\\docx_content\\",
+                        #         should_extract["files"][index],
+                        #     )
+                        # )
+
+                    else:
+                        data = f.read()
+
+                        # get content data of file in `docx_content` dir
+                        content_data = BeautifulSoup(data, "xml")
+                        # overwrite the files content with content in `docx_content` dir
+                        content.writestr(
+                            file_index_path,
+                            bytes(str(content_data), encoding="utf-8"),
+                        )
+                        f.close()
 
                 index += 1
 
