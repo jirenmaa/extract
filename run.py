@@ -13,16 +13,14 @@ from bs4 import BeautifulSoup
 
 _root_ = str(pathlib.Path(__file__).parent.absolute())
 _file_ = ""
-docx = ""
+docx_name = ""
 
 image = {
     "name": "",
     "path": "",
 }
 
-skip_file = [
-    "[Content_Types].xml"
-]
+skip_file = []
 
 should_extract = {"files": "", "paths": ""}
 
@@ -100,8 +98,9 @@ def ext_docx_content_from_image():
 
 def create_docx_template(name="result.docx"):
     """Create docx file template for merging docx"""
-    global docx
+    global docx_name
 
+    docx_name = name
     docx = Document()
     docx.add_heading("Template Document", 0)
     docx.save(name)
@@ -109,21 +108,21 @@ def create_docx_template(name="result.docx"):
 
 def merging_docx():
     """Merging content of file docx with template docx"""
+    global docx_name
 
     mime_type = (".jpg", ".png", ".jpeg")
 
     # delete file that have same name as the file that should be extracted
-    print(should_extract)
-    index = 0
     for file in should_extract["paths"]:
         zipfile.delete_from_zip_file(
-            "result.docx", pattern=should_extract["paths"][index]
+            docx_name, pattern=".*.xml"
+        )
+        zipfile.delete_from_zip_file(
+            docx_name, pattern=".*.rels"
         )
 
-        index += 1
-
     # python run.py -f tugas_img_test.docx
-    with zipfile.ZipFile("result.docx", "a") as content:
+    with zipfile.ZipFile(docx_name, "a") as content:
         try:
             index = 0
             for file in should_extract["paths"]:
@@ -135,23 +134,15 @@ def merging_docx():
 
                 with open(file_path, "r", encoding="utf-8") as f:
                     if file_index_path.endswith(mime_type):
-                        image_path = "%s%s" % (_root_ + "\\archive\\docx_content\\", should_extract["files"][index])
+                        image_path = "%s%s" % (
+                            _root_ + "\\archive\\docx_content\\",
+                            should_extract["files"][index],
+                        )
 
                         image_handle = open(image_path, "rb")
                         raw_image_data = image_handle.read()
-                        content.writestr(
-                            file_index_path,
-                            raw_image_data
-                        )
+                        content.writestr(file_index_path, raw_image_data)
                         image_handle.close()
-
-                        # docx.add_picture(
-                        #     "%s%s"
-                        #     % (
-                        #         _root_ + "\\archive\\docx_content\\",
-                        #         should_extract["files"][index],
-                        #     )
-                        # )
 
                     else:
                         data = f.read()
@@ -166,14 +157,18 @@ def merging_docx():
                         f.close()
 
                 index += 1
-
-            # delete dir
-            shutil.rmtree(_root_ + "\\archive")
-
-            print("File has been merged.")
-            print("Completed.")
         except Exception as ex:
             print(ex)
+
+    zipfile.delete_from_zip_file(
+        docx_name, pattern=".*thumbnail.jpeg"
+    )
+
+    # delete dir
+    shutil.rmtree(_root_ + "\\archive")
+
+    print("File has been merged.")
+    print("Completed.")
 
 
 def command(args):
