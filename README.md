@@ -8,6 +8,6 @@ Extract an image that have content of docx, and return the content to new docx f
 
     pipenv install
 
-## Running
+## Run
 
     python run.py -f file
